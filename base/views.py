@@ -9,7 +9,7 @@ from rest_framework.generics import RetrieveUpdateDestroyAPIView,ListCreateAPIVi
 from rest_framework.generics import ListAPIView,RetrieveAPIView,UpdateAPIView,CreateAPIView,DestroyAPIView
 
 # Create your views here.
-class RestaurantList(ListModelMixin,GenericViewSet):
+class RestaurantList(RetrieveModelMixin,ListModelMixin,GenericViewSet):
     queryset = restaurant.objects.all()
     serializer_class = RestaurantSerializer
 
