@@ -13,7 +13,7 @@ class RestaurantList(RetrieveModelMixin,ListModelMixin,GenericViewSet):
     queryset = restaurant.objects.all()
     serializer_class = RestaurantSerializer
 
-class TypeList(ListModelMixin,GenericViewSet):
+class TypeList(RetrieveModelMixin,ListModelMixin,GenericViewSet):
     queryset = type.objects.all()
     serializer_class = TypeSerializer
 
@@ -31,7 +31,7 @@ class ProductList(ListModelMixin,RetrieveModelMixin,GenericViewSet):
             return ProductSerializer(*args,**kwargs)
     
 
-class CategoryList(GenericViewSet,ListModelMixin):
+class CategoryList(RetrieveModelMixin,GenericViewSet,ListModelMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
