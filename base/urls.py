@@ -16,8 +16,8 @@ nested_routers.register('products',views.ProductList,basename='restaurant-produc
 
 urlpatterns = [
     path('',include(router.urls)),
-    path('',include(nested_routers.urls))
-    
+    path('',include(nested_routers.urls)),
+
     # router.register('product',views.ProductList),
     # router.register('product/<int:pk>',views.GetProduct)
 ]

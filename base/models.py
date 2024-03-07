@@ -1,19 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator
 ############################################################################
-VERY_SMALL = 'VS'
-SMALL = 'S'
-MEDIUM = 'M'
-LARGE = 'L'
-VERY_LARGE = 'VL'
-
-SIZE_CHOICES = [
-    (VERY_SMALL, 'Very Small'),
-    (SMALL, 'Small'),
-    (MEDIUM, 'Medium'),
-    (LARGE, 'Large'),
-    (VERY_LARGE, 'Very Large'),
-]
 
 # Create your models here.
 
@@ -42,6 +29,3 @@ class Product(models.Model):
     size = models.CharField(max_length=50,default='Small')
     images = models.TextField()
 
-
-def get_size_display(self):
-    return dict(self.SIZE_CHOICES)[self.size]

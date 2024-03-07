@@ -26,7 +26,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     category = CategorySerializer(source='Category')
     class Meta:
         model = Product
-        fields = ['id','name','restaurant','Rate','Price','Date_of_creation','Descreption','sizes','category','images']
+        fields = ['id','name','restaurant','Rate','Price','Date_of_creation','Descreption','size','category','images']
     restaurant = SimpleRestaurantSerializer()
 
 
