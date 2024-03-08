@@ -10,6 +10,8 @@ class type(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
+    logo = models.URLField()
+
 
 class restaurant(models.Model):
     name = models.TextField()

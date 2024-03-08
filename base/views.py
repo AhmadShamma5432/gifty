@@ -45,10 +45,10 @@ class ProductList(ListModelMixin,RetrieveModelMixin,GenericViewSet):
     queryset = Product.objects.all()
     # serializer_class = ProductSerializer
     def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return ProductSerializer
-        elif self.action == 'list':
+        if self.action == 'list':
             return ProductListSerializer
+        elif self.action == 'retrieve':
+            return ProductSerializer
 
 class ProductCategoryList(ListModelMixin,RetrieveModelMixin,GenericViewSet):
     serializer_class = ProductSerializer
