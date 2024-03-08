@@ -9,7 +9,7 @@ class TypeSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id','name']
+        fields = ['id','name','logo']
 
 class RestaurantSerializer(serializers.ModelSerializer):
     type = TypeSerializer()
