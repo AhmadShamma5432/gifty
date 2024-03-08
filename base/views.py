@@ -10,26 +10,64 @@ from rest_framework.generics import ListAPIView,RetrieveAPIView,UpdateAPIView,Cr
 
 # Create your views here.
 class RestaurantList(RetrieveModelMixin,ListModelMixin,GenericViewSet):
-    queryset = restaurant.objects.all()
     serializer_class = RestaurantSerializer
+
+    def get_queryset(self):
+        queryset = restaurant.objects.all()
+
+        try:
+            location = self.request.query_params.get('Location')
+            if location :
+                queryset = restaurant.objects.filter(Location=location)
+            return queryset
+        except:
+            return queryset
+        
+
 
 class TypeList(RetrieveModelMixin,ListModelMixin,GenericViewSet):
     queryset = type.objects.all()
     serializer_class = TypeSerializer
 
-class ProductList(ListModelMixin,RetrieveModelMixin,GenericViewSet):
+class ProductRestaurantList(ListModelMixin,RetrieveModelMixin,GenericViewSet):
     serializer_class = ProductSerializer
     
     def get_queryset(self):
         return Product.objects.filter(restaurant_id=self.kwargs['restaurant_pk'])
 
     def get_serializer(self, *args, **kwargs):
-        try:
-            something = self.kwargs['pk']
+        if self.action == 'retrieve':
             return ProductListSerializer(*args,**kwargs)
-        except:
+        if self.action == 'list':
             return ProductSerializer(*args,**kwargs)
+
+class ProductList(ListModelMixin,RetrieveModelMixin,GenericViewSet):
+    queryset = Product.objects.all()
+    # serializer_class = ProductSerializer
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return ProductSerializer
+        elif self.action == 'list':
+            return ProductListSerializer
+
+class ProductCategoryList(ListModelMixin,RetrieveModelMixin,GenericViewSet):
+    serializer_class = ProductSerializer
     
+    def get_queryset(self):
+        return Product.objects.filter(Category_id=self.kwargs['category_pk'])
+
+    def get_serializer(self, *args, **kwargs):
+        if self.action == 'retrieve':
+            return ProductListSerializer(*args,**kwargs)
+        if self.action == 'list':
+            return ProductSerializer(*args,**kwargs)
+          
+class RestaurantTypeList(ListModelMixin,RetrieveModelMixin,GenericViewSet):
+    serializer_class = RestaurantSerializer
+    
+    def get_queryset(self):
+        return restaurant.objects.filter(type_id=self.kwargs['type_pk'])
+
 
 class CategoryList(RetrieveModelMixin,GenericViewSet,ListModelMixin):
     queryset = Category.objects.all()

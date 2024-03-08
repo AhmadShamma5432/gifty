@@ -25,8 +25,8 @@ SECRET_KEY = 'django-insecure-xvez6ji71j7a&qk4_54i=_#o$+ksdlnpa_b8mje$u=f%nua$$z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
-ALLOWED_HOSTS = ['AhmadShamma.pythonanywhere.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+# ALLOWED_HOSTS = ['AhmadShamma.pythonanywhere.com']
 
 
 # Application definition
@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['AhmadShamma.pythonanywhere.com']
 INSTALLED_APPS = [
     'base',
     'rest_framework',
+    'drf_spectacular',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.messages',
@@ -70,6 +71,12 @@ TEMPLATES = [
         },
     },
 ]
+
+REST_FRAMEWORK = {
+    # ... your other DRF settings ...
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
 
 WSGI_APPLICATION = 'foodordering.wsgi.application'
 
