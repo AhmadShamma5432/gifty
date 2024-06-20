@@ -10,14 +10,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='category',
-            name='logo',
-        ),
-        migrations.AddField(
-            model_name='category',
-            name='image',
-            field=models.URLField(default='https://th.bing.com/th/id/OIP.2ZhDKxFY2acBHFv5RHXPsgHaEo?rs=1&pid=ImgDetMain'),
-            preserve_default=False,
-        ),
+        # migrations.RemoveField(
+        #     model_name='category',
+        #     name='logo',
+        # ),
+        # migrations.AddField(
+        #     model_name='category',
+        #     name='image',
+        #     field=models.URLField(default='https://th.bing.com/th/id/OIP.2ZhDKxFY2acBHFv5RHXPsgHaEo?rs=1&pid=ImgDetMain'),
+        #     preserve_default=False,
+        # ),
     ]

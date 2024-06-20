@@ -1,33 +1,38 @@
-from . import views
-from django.urls import path,include
+from .views import * 
+from django.urls import include,path 
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 router = DefaultRouter()
-router.register('type',views.TypeList,basename='type')
-router.register('category',views.CategoryList,basename='category')
-router.register('restaurant',views.RestaurantList,basename='restaurant')
-router.register('product',views.ProductList,basename='restaurant')
+router.register('type',TypeList,basename='type')
+router.register('category',CategoryList,basename='category')
+router.register('restaurant',RestaurantList,basename='restaurant')
+router.register('product',ProductList,basename='product')
+router.register('cart',CartView,basename='cart')
 
 
 nested_routers = routers.NestedDefaultRouter(router,'restaurant',lookup='restaurant')
-nested_routers.register('products',views.ProductRestaurantList,basename='restaurant-product')
+nested_routers.register('products',ProductList,basename='restaurant-product')
 
 nested_category_routers = routers.NestedDefaultRouter(router,'category',lookup='category')
-nested_category_routers.register('products',views.ProductCategoryList,basename='category-product')
+nested_category_routers.register('products',ProductList,basename='category-product')
 
 nested_type_routers = routers.NestedDefaultRouter(router,'type',lookup='type')
-nested_type_routers.register('restaurant',views.RestaurantTypeList,basename='type-restaurant')
+nested_type_routers.register('restaurant',RestaurantList,basename='type-restaurant')
+
+nested_image_routers = routers.NestedDefaultRouter(router,'product',lookup='product')
+nested_image_routers.register('images',ProductImageList,basename='product-image')
+
+nested_cart_router = routers.NestedDefaultRouter(router,'cart',lookup='cart')
+nested_cart_router.register('items',CartItemView,basename='cart-items')
 
 urlpatterns = [
     path('',include(router.urls)),
     path('',include(nested_routers.urls)),
     path('',include(nested_category_routers.urls)),
     path('',include(nested_type_routers.urls)),
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    # router.register('product',views.ProductList),
-    # router.register('product/<int:pk>',views.GetProduct)
+    path('',include(nested_image_routers.urls)),
+    path('',include(nested_cart_router.urls)),
+    
+    
 ]
