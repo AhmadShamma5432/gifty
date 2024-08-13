@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "BUILD START"
 # Ensure pip is installed
 python3 -m ensurepip --upgrade
