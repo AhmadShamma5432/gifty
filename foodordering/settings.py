@@ -91,7 +91,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
 }
 
-WSGI_APPLICATION = 'foodordering.wsgi.application'
+WSGI_APPLICATION = 'foodordering.wsgi.app'
 
 
 # Database
@@ -100,10 +100,10 @@ WSGI_APPLICATION = 'foodordering.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'FoodOrdering',
-        'USER': 'root',
+        'NAME': 'AhmadShamma$Test',
+        'USER': 'AhmadShamma',
         'PASSWORD': 'abogasan456%',
-        'HOST': 'localhost',  # You can use another host if your database is on a remote server.
+        'HOST': 'AhmadShamma.mysql.pythonanywhere-services.com',  # You can use another host if your database is on a remote server.
         'PORT': '3306',       # Default MySQL port.
         # 'OPTIONS': {
         #     "init_command": "SET foreign_key_checks = 0;",
