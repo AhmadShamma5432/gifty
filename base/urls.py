@@ -9,7 +9,8 @@ router.register('category',CategoryList,basename='category')
 router.register('restaurant',RestaurantList,basename='restaurant')
 router.register('product',ProductList,basename='product')
 router.register('cart',CartView,basename='cart')
-
+router.register('customer',CustomerView,basename='customer')
+router.register('order',OrderView,basename='order')
 
 nested_routers = routers.NestedDefaultRouter(router,'restaurant',lookup='restaurant')
 nested_routers.register('products',ProductList,basename='restaurant-product')
@@ -33,6 +34,4 @@ urlpatterns = [
     path('',include(nested_type_routers.urls)),
     path('',include(nested_image_routers.urls)),
     path('',include(nested_cart_router.urls)),
-    
-    
 ]

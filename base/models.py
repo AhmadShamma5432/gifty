@@ -1,5 +1,6 @@
 from django.db import models
 from uuid import uuid4
+from foodordering.settings import AUTH_USER_MODEL
 from .validations import * 
 ############################################################################
 
@@ -48,3 +49,28 @@ class CartItem(models.Model):
 
     class Meta:
         unique_together = [['cart','product']]
+
+class Customer(models.Model):
+    phone_number = models.CharField(max_length=255)
+    birth_date = models.DateField(null=True,blank=True)
+    user=models.OneToOneField(AUTH_USER_MODEL,on_delete=models.CASCADE)
+
+class Order(models.Model):
+    pending = 'P'
+    complete = 'C'
+    failed = 'F'
+    CHOICES_ARRAY = [
+        (pending , 'pending'),
+        (complete , 'complete'),
+        (failed , 'failed')
+    ]
+    placed_at = models.DateField(auto_now_add = True)
+    payment_status = models.CharField( max_length=1,choices = CHOICES_ARRAY , default=pending)
+    customer = models.ForeignKey(Customer,on_delete=models.PROTECT)
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order,on_delete=models.PROTECT,related_name='items')
+    product = models.ForeignKey(Product,on_delete=models.PROTECT)
+    quantity = models.IntegerField()
+    price = models.DecimalField(max_digits=9,decimal_places=3)
