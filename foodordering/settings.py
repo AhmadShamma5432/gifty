@@ -92,7 +92,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
 }
 
-WSGI_APPLICATION = 'foodordering.wsgi.app'
+WSGI_APPLICATION = 'foodordering.wsgi.application'
 
 
 # Database

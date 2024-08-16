@@ -35,32 +35,32 @@ class ProductImageSerializer(serializers.ModelSerializer):
         return ProductImage.objects.create(product_id=product_id,**validated_data)
 
 class ProductListSerializer(serializers.ModelSerializer):
-    category = serializers.SerializerMethodField()
-    restaurant = serializers.SerializerMethodField()
-    image = ProductImageSerializer(read_only=True,many=True)
+    # category = serializers.IntegerField()
+    # restaurant = serializers.IN()
+    # image = ProductImageSerializer(read_only=True,many=True)
     class Meta:
         model = Product
-        fields = ['id','name','restaurant','Rate','Price','Date_of_creation','Descreption','size','category','image']
+        fields = ['id','name','Rate','Price','Date_of_creation','Descreption','size']
 
-    def get_restaurant(self,obj):
-        return obj.restaurant.name
+    # def get_restaurant(self,obj):
+    #     return obj.restaurant.name
 
-    def get_category(self,obj):
-        return obj.Category.name
+    # def get_category(self,obj):
+    #     return obj.Category.name
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = serializers.SerializerMethodField()
-    restaurant = serializers.SerializerMethodField()
+    # category = serializers.SerializerMethodField()
+    # restaurant = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ['id','name','restaurant','Rate','Price','Date_of_creation','category']
+        fields = ['id','Rate','Price','Date_of_creation']
 
-    def get_restaurant(self,obj):
-        return obj.restaurant.name
+    # def get_restaurant(self,obj):
+    #     return obj.restaurant.name
 
-    def get_category(self,obj):
-        return obj.Category.name
+    # def get_category(self,obj):
+    #     return obj.Category.name
     
 
 

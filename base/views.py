@@ -36,8 +36,6 @@ class RestaurantList(ModelViewSet):
 
         return queryset
 
-
-
 class ProductList(UpdateModelMixin,ListModelMixin,RetrieveModelMixin,GenericViewSet):
 
     def get_queryset(self):
@@ -56,6 +54,8 @@ class ProductList(UpdateModelMixin,ListModelMixin,RetrieveModelMixin,GenericView
         if self.action == 'list':
             return ProductListSerializer
         elif self.action == 'retrieve':
+            return ProductSerializer
+        else:
             return ProductSerializer
 
 class ProductImageList(ModelViewSet):
