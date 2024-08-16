@@ -27,8 +27,8 @@ SECRET_KEY = 'django-insecure-xvez6ji71j7a&qk4_54i=_#o$+ksdlnpa_b8mje$u=f%nua$$z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app', '.now.sh']
-# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+# ALLOWED_HOSTS = ['.vercel.app', '.now.sh']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 # ALLOWED_HOSTS = ['AhmadShamma.pythonanywhere.com']
 
 
@@ -92,7 +92,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
 }
 
-WSGI_APPLICATION = 'foodordering.wsgi.app'
+WSGI_APPLICATION = 'foodordering.wsgi.application'
 
 
 # Database
