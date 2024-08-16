@@ -101,10 +101,10 @@ WSGI_APPLICATION = 'foodordering.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'AhmadShamma$Test',
-        'USER': 'AhmadShamma',
+        'NAME': 'FoodOrdering',
+        'USER': 'root',
         'PASSWORD': 'abogasan456%',
-        'HOST': 'AhmadShamma.mysql.pythonanywhere-services.com',  # You can use another host if your database is on a remote server.
+        'HOST': 'localhost',  # You can use another host if your database is on a remote server.
         'PORT': '3306',       # Default MySQL port.
         # 'OPTIONS': {
         #     "init_command": "SET foreign_key_checks = 0;",

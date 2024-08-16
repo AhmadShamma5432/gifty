@@ -2,7 +2,7 @@ from django.db.models import Prefetch
 from rest_framework.viewsets import *
 from rest_framework.mixins import *
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated,IsAdminUser
+from rest_framework.permissions import IsAuthenticated,IsAdminUser,AllowAny
 from .models import *
 from .serializers import *
 # Create your views here.
@@ -12,9 +12,10 @@ class TypeList(RetrieveModelMixin,ListModelMixin,GenericViewSet):
     queryset = type.objects.all()
     serializer_class = TypeSerializer
 
-class CategoryList(RetrieveModelMixin,GenericViewSet,ListModelMixin):
+class CategoryList(UpdateModelMixin,CreateModelMixin,RetrieveModelMixin,GenericViewSet,ListModelMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+        
 
 class RestaurantList(ModelViewSet):
     serializer_class = RestaurantSerializer
