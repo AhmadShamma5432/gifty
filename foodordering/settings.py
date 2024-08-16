@@ -92,12 +92,11 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
 }
 
-WSGI_APPLICATION = 'foodordering.wsgi.application'
+WSGI_APPLICATION = 'foodordering.wsgi.app'
 
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -111,7 +110,6 @@ DATABASES = {
         # },
     }
 }
-
 INTERNAL_IPS = [
     "127.0.0.1",
 ]

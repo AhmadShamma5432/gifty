@@ -12,7 +12,7 @@ class TypeList(RetrieveModelMixin,ListModelMixin,GenericViewSet):
     queryset = type.objects.all()
     serializer_class = TypeSerializer
 
-class CategoryList(UpdateModelMixin,CreateModelMixin,RetrieveModelMixin,GenericViewSet,ListModelMixin):
+class CategoryList(UpdateModelMixin,CreateModelMixin,RetrieveModelMixin,ListModelMixin,GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
         
@@ -38,7 +38,7 @@ class RestaurantList(ModelViewSet):
 
 
 
-class ProductList(ListModelMixin,RetrieveModelMixin,GenericViewSet):
+class ProductList(UpdateModelMixin,ListModelMixin,RetrieveModelMixin,GenericViewSet):
 
     def get_queryset(self):
         queryset = Product.objects.prefetch_related('image').select_related('restaurant').select_related('Category').all()
