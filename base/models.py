@@ -51,8 +51,8 @@ class CartItem(models.Model):
         unique_together = [['cart','product']]
 
 class Customer(models.Model):
-    phone_number = models.CharField(max_length=255)
-    birth_date = models.DateField(null=True,blank=True)
+    # phone_number = models.CharField(max_length=255)
+    # birth_date = models.DateField(null=True,blank=True)
     user=models.OneToOneField(AUTH_USER_MODEL,on_delete=models.CASCADE)
 
 class Order(models.Model):

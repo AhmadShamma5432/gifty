@@ -136,15 +136,14 @@ class GetCartSerializer(serializers.ModelSerializer):
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['id','user_id','phone_number','birth_date']
+        fields = ['id','user_id']
 
     def create(self, validated_data):
         user_id = self.context['user_id']
         validated_data['user_id'] = user_id
 
-        cus = Customer.objects.create(**validated_data)
-        print(cus)
-        return cus
+        customer = Customer.objects.create(**validated_data)
+        return customer
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer()

@@ -112,10 +112,6 @@ class CustomerView(CreateModelMixin,UpdateModelMixin,RetrieveModelMixin,GenericV
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         customer = self.perform_create(serializer)
-        # customer = serializer.instance
-        print(customer)
-
-        print(CustomerSerializer(customer).data)
         return Response(CustomerSerializer(customer).data)
     
     
