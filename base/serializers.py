@@ -20,10 +20,7 @@ class RestaurantSerializer(serializers.ModelSerializer):
         fields = ['id','name','Rate','Location','type','image']
     
     def get_type(self,obj):
-        if( obj.type != None):
-            return 1
-        else:
-            return None
+        return obj.type.name
     
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,33 +32,33 @@ class ProductImageSerializer(serializers.ModelSerializer):
         return ProductImage.objects.create(product_id=product_id,**validated_data)
 
 class ProductListSerializer(serializers.ModelSerializer):
-    # category = serializers.IntegerField()
-    # restaurant = serializers.IN()
+    category = serializers.SerializerMethodField()
+    restaurant = serializers.SerializerMethodField()
     # image = ProductImageSerializer(read_only=True,many=True)
     class Meta:
         model = Product
-        fields = ['id','name','Rate','Price','Date_of_creation','Descreption','size']
+        fields = ['id','name','Rate','Price','Date_of_creation','Descreption','size','category','restaurant']
 
-    # def get_restaurant(self,obj):
-    #     return obj.restaurant.name
-
-    # def get_category(self,obj):
-    #     return obj.Category.name
+    def get_restaurant(self,obj):
+        return obj.restaurant.name
+    
+    def get_category(self,obj):
+        return obj.Category.name
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    # category = serializers.SerializerMethodField()
-    # restaurant = serializers.SerializerMethodField()
+    category = serializers.SerializerMethodField()
+    restaurant = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ['id','Rate','Price','Date_of_creation']
+        fields = ['id','Rate','Price','Date_of_creation','category','restaurant']
 
-    # def get_restaurant(self,obj):
-    #     return obj.restaurant.name
-
-    # def get_category(self,obj):
-    #     return obj.Category.name
+    def get_restaurant(self,obj):
+        return obj.restaurant.name
     
+    def get_category(self,obj):
+        return obj.Category.name
+
 
 
 class SimpleProductSerializer(serializers.ModelSerializer):
