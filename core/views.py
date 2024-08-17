@@ -8,10 +8,11 @@ from .serializers import UserRetrieveSerializer,UserUpdateSerializer
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-class UserUpdateView(UpdateModelMixin,ListModelMixin,GenericViewSet):
+class UserUpdateView(RetrieveModelMixin,UpdateModelMixin,ListModelMixin,GenericViewSet):
 
     def get_queryset(self):
-        return User.objects.filter(id = self.request.user.id)
+        print(self.request.user.id)
+        return User.objects.filter(id=self.request.user.id)
     
     def get_serializer_class(self):
         if self.request.method == 'PUT':
