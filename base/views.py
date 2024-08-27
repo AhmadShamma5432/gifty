@@ -36,7 +36,7 @@ class RestaurantList(ModelViewSet):
 
         return queryset
 
-class ProductList(UpdateModelMixin,ListModelMixin,RetrieveModelMixin,GenericViewSet):
+class ProductList(ModelViewSet):
 
     def get_queryset(self):
         queryset = Product.objects.prefetch_related('image').select_related('restaurant').select_related('Category').all()

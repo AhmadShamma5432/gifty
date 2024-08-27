@@ -9,11 +9,21 @@ from .validations import *
 class type(models.Model):
     name = models.CharField(max_length=255)
 
+    def __str__(self) -> str:
+        return self.name
+
+    class Meta:
+        ordering = ['name']
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
     logo = models.ImageField(blank=True,null=True,upload_to='base/category_logos')
 
+    def __str__(self) -> str:
+        return self.name
+
+    class Meta:
+        ordering = ['name']
 
 class restaurant(models.Model):
     name = models.TextField()
@@ -21,6 +31,10 @@ class restaurant(models.Model):
     Location = models.CharField(max_length=255)
     type = models.ForeignKey(type,on_delete=models.SET_NULL,null=True)
     image = models.ImageField(upload_to='base/restaurant_images')
+
+    def __str__(self) -> str:
+        return self.name
+    
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -32,6 +46,11 @@ class Product(models.Model):
     Descreption = models.TextField()
     size = models.CharField(max_length=50,default='Small',null=True,blank=True)
 
+    def __str__(self) -> str:
+        return self.name
+
+    # class Meta:
+    #     ordering = ['Price']
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,null=False,blank=False,related_name='image')
