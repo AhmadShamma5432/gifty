@@ -1,95 +1,121 @@
 from django.db import models
-from uuid import uuid4
 from foodordering.settings import AUTH_USER_MODEL
-from .validations import * 
-############################################################################
+from .validations import validate_rate, validate_price
 
-# Create your models here.
-
-class type(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self) -> str:
-        return self.name
-
-    class Meta:
-        ordering = ['name']
 
 class Category(models.Model):
-    name = models.CharField(max_length=255)
-    logo = models.ImageField(blank=True,null=True,upload_to='base/category_logos')
+    name_en = models.CharField(max_length=255)
+    name_ar = models.CharField(max_length=255)
+    description_en = models.TextField(blank=True, null=True)
+    description_ar = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='categories/', null=True, blank=True)
 
-    def __str__(self) -> str:
-        return self.name
+    def __str__(self):
+        return f"{self.name_en} "
 
     class Meta:
-        ordering = ['name']
+        db_table = 'category'
 
-class restaurant(models.Model):
-    name = models.TextField()
-    Rate = models.DecimalField(max_digits=4,decimal_places=2,validators=[validate_rate])
-    Location = models.CharField(max_length=255)
-    type = models.ForeignKey(type,on_delete=models.SET_NULL,null=True)
-    image = models.ImageField(upload_to='base/restaurant_images')
+class Brand(models.Model):
+    name_en = models.CharField(max_length=255)
+    name_ar = models.CharField(max_length=255)
+    description_en = models.TextField(blank=True, null=True)
+    description_ar = models.TextField(blank=True, null=True)
+    address = models.TextField()
+    city = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='brands/', null=True, blank=True)
 
-    def __str__(self) -> str:
-        return self.name
-    
+    def __str__(self):
+        return f"{self.name_en}"
+
+    class Meta:
+        db_table = 'brand'
 
 class Product(models.Model):
-    name = models.CharField(max_length=255)
-    Rate = models.DecimalField(max_digits=4,decimal_places=2,validators=[validate_rate],null=True)
-    Price = models.DecimalField(max_digits=19,decimal_places=9,validators=[validate_price])
-    Date_of_creation= models.DateField(auto_now_add=True)
-    restaurant = models.ForeignKey(restaurant,on_delete=models.SET_NULL,null=True)
-    Category = models.ForeignKey(Category,on_delete=models.SET_NULL,null=True)
-    Descreption = models.TextField()
-    size = models.CharField(max_length=50,default='Small',null=True,blank=True)
+    name_en = models.CharField(max_length=255)
+    name_ar = models.CharField(max_length=255)
+    description_en = models.TextField(blank=True, null=True)
+    description_ar = models.TextField(blank=True, null=True)
+    rate = models.DecimalField(max_digits=4, decimal_places=2, validators=[validate_rate], null=True, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_price])
+    date_of_creation = models.DateField(auto_now_add=True)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True, related_name="products")
+    is_active = models.BooleanField(default=True)
 
-    def __str__(self) -> str:
-        return self.name
-
-    # class Meta:
-    #     ordering = ['Price']
-
-class ProductImage(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE,null=False,blank=False,related_name='image')
-    image = models.ImageField(upload_to='base/product_images')
-
-
-class Cart(models.Model):
-    id = models.UUIDField(primary_key=True,default=uuid4)
-    created_at = models.DateField(auto_now_add=True)
-
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name='items')
-    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_cartitem')
-    quantity = models.PositiveIntegerField(validators=[validate_quantity])
+    def __str__(self):
+        return f"{self.name_en}"
 
     class Meta:
-        unique_together = [['cart','product']]
+        db_table = 'product'
 
-class Customer(models.Model):
-    # phone_number = models.CharField(max_length=255)
-    # birth_date = models.DateField(null=True,blank=True)
-    user=models.OneToOneField(AUTH_USER_MODEL,on_delete=models.CASCADE)
+class CategoryBrand(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="brand_relationships")
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="category_relationships")
+    created_at = models.DateTimeField(auto_now_add=True)
 
-class Order(models.Model):
-    pending = 'P'
-    complete = 'C'
-    failed = 'F'
-    CHOICES_ARRAY = [
-        (pending , 'pending'),
-        (complete , 'complete'),
-        (failed , 'failed')
-    ]
-    placed_at = models.DateField(auto_now_add = True)
-    payment_status = models.CharField( max_length=1,choices = CHOICES_ARRAY , default=pending)
-    customer = models.ForeignKey(Customer,on_delete=models.PROTECT)
+    class Meta:
+        unique_together = ('category', 'brand')
+        db_table = 'category_brand'
+
+    def __str__(self):
+        return f"{self.category.name_en} - {self.brand.name_en}"
+
+class ProductCategory(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="category_relationships")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="product_relationships")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('product', 'category')
+        db_table = 'product_category'
+
+    def __str__(self):
+        return f"{self.product.name_en} - {self.category.name_en}"
+    
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to='products/')
+    is_primary = models.BooleanField(default=False)  # Mark one image as primary
+
+    def __str__(self):
+        return f"Image for {self.product}"
+
+class Favorite(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="favorites_product")
+    user = models.ForeignKey(AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='user_favorites')
+
+    class Meta:
+        unique_together = ('product','user')
+        db_table = 'favorite'
+# class Cart(models.Model):
+#     id = models.UUIDField(primary_key=True,default=uuid4)
+#     created_at = models.DateField(auto_now_add=True)
+
+# class CartItem(models.Model):
+#     cart = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name='items')
+#     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_cartitem')
+#     quantity = models.PositiveIntegerField(validators=[validate_quantity])
+
+#     class Meta:
+#         unique_together = [['cart','product']]
 
 
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order,on_delete=models.PROTECT,related_name='items')
-    product = models.ForeignKey(Product,on_delete=models.PROTECT)
-    quantity = models.IntegerField()
-    price = models.DecimalField(max_digits=9,decimal_places=3)
+# class Order(models.Model):
+#     pending = 'P'
+#     complete = 'C'
+#     failed = 'F'
+#     CHOICES_ARRAY = [
+#         (pending , 'pending'),
+#         (complete , 'complete'),
+#         (failed , 'failed')
+#     ]
+#     placed_at = models.DateField(auto_now_add = True)
+#     payment_status = models.CharField( max_length=1,choices = CHOICES_ARRAY , default=pending)
+#     customer = models.ForeignKey(Customer,on_delete=models.PROTECT)
+
+
+# class OrderItem(models.Model):
+#     order = models.ForeignKey(Order,on_delete=models.PROTECT,related_name='items')
+#     product = models.ForeignKey(Product,on_delete=models.PROTECT)
+#     quantity = models.IntegerField()
+#     price = models.DecimalField(max_digits=9,decimal_places=3)

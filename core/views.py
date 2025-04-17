@@ -11,7 +11,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class UserUpdateView(RetrieveModelMixin,UpdateModelMixin,ListModelMixin,GenericViewSet):
 
     def get_queryset(self):
-        print(self.request.user.id)
         return User.objects.filter(id=self.request.user.id)
     
     def get_serializer_class(self):

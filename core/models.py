@@ -22,7 +22,6 @@ class User(AbstractUser):
     name = models.TextField()
     email = models.EmailField(unique=True)
     phone_number = models.TextField()
-    address = models.TextField()
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

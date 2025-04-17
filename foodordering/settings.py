@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'django.contrib.contenttypes',
-    'djoser',    
+    'djoser',   
+    'rest_framework_simplejwt.token_blacklist', 
 ]
 
 MIDDLEWARE = [
@@ -88,8 +89,10 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {    
     'ACCESS_TOKEN_LIFETIME': timedelta(days=30),  # Set access token lifetime to 30 days
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=60),
-    'AUTH_HEADER_TYPES': ('JWT',),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
+    'ROTATE_REFRESH_TOKENS': True,  # Rotate refresh tokens for added security
+    'BLACKLIST_AFTER_ROTATION': True,  # Blacklist old refresh tokens after rotation
+    'AUTH_HEADER_TYPES': ('JWT',)
 }
 
 WSGI_APPLICATION = 'foodordering.wsgi.application'
@@ -100,9 +103,9 @@ WSGI_APPLICATION = 'foodordering.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'FoodOrdering',
-        'USER': 'root',
-        'PASSWORD': 'abogasan456%',
+        'NAME': 'Gifty',
+        'USER': 'ahmad',
+        'PASSWORD': 'asd123',
         'HOST': 'localhost',  # You can use another host if your database is on a remote server.
         'PORT': '3306',       # Default MySQL port.
         # 'OPTIONS': {
@@ -169,3 +172,5 @@ DJOSER = {
         'current_user' : 'core.serializers.UserSerializer'
     }
 }
+
+

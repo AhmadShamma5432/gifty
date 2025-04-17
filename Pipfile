@@ -7,10 +7,12 @@ name = "pypi"
 django = "*"
 pymysql = "*"
 djangorestframework = "*"
+pytest-watch = "*"
 
 [dev-packages]
 pytest = "*"
 pytest-django = "*"
+locust = "*"
 
 [requires]
 python_version = "3.11"
