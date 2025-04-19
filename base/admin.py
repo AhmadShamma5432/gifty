@@ -8,6 +8,7 @@ from .models import (
     ProductCategory,
     ProductImage,
     Favorite,
+    City
 )
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -83,3 +84,13 @@ class FavoriteAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'product__name_en')
 
 admin.site.register(Favorite, FavoriteAdmin)
+
+
+class CityAdmin(admin.ModelAdmin):
+    list_display = ('id','name_en', 'name_ar')
+    
+    search_fields = ('name_en', 'name_ar')
+    
+    list_filter = ('name_en',)
+
+admin.site.register(City, CityAdmin)
