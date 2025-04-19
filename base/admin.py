@@ -94,3 +94,4 @@ class CityAdmin(admin.ModelAdmin):
     list_filter = ('name_en',)
 
 admin.site.register(City, CityAdmin)
+
