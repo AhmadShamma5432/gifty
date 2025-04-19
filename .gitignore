@@ -16,6 +16,7 @@ __pycache__/
 eggs/
 .eggs/
 lib/
+include/
 Scripts/
 lib64/
 parts/

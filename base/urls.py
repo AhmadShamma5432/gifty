@@ -7,6 +7,7 @@ router = DefaultRouter()
 router.register(r'products', ProductViewSet, basename='product')
 router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'favorites', FavoriteView, basename='favorite')
+router.register(r'cities', CityViewSet, basename='city')
 
 
 nested_router = routers.NestedSimpleRouter(router, r'categories', lookup='category')

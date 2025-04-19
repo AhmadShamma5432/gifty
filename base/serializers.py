@@ -8,7 +8,13 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name_en', 'name_ar', 'description_en', 'description_ar', 'image']
 
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['id', 'name_en', 'name_ar']
+
 class BrandSerializer(serializers.ModelSerializer):
+    city = CitySerializer(read_only=True)
     class Meta:
         model = Brand
         fields = ['id', 'name_en', 'name_ar', 'description_en', 'description_ar', 'address', 'city', 'image']

@@ -12,8 +12,15 @@ class ProductViewSet(GeneralMixin):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.prefetch_related('images').all()
+        queryset = Product.objects.select_related('brand__city').prefetch_related('images').all()
         is_active = self.request.query_params.get('active', 'true').lower() == 'true'
+        city = self.request.query_params.get('city') 
+        print(city)
+        print(queryset)
+        if city: 
+            queryset = queryset.filter(brand__city__name_en=city)
+            
+        print(queryset) 
         queryset = queryset.filter(is_active=is_active)
 
         return queryset
@@ -66,6 +73,13 @@ class FavoriteView(GeneralMixin,CreateModelMixin,DestroyModelMixin):
 
     def get_serializer_context(self):
         return {"user_id": self.request.user.id}
+    
+class CityViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows cities to be viewed or edited.
+    """
+    queryset = City.objects.all()  # Order by English name
+    serializer_class = CitySerializer
 # class CartView(CreateModelMixin,DestroyModelMixin,RetrieveModelMixin,GenericViewSet):
 
 #     def get_queryset(self):

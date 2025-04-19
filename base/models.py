@@ -16,13 +16,23 @@ class Category(models.Model):
     class Meta:
         db_table = 'category'
 
+class City(models.Model):
+    name_en = models.CharField(max_length=255)
+    name_ar = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.name_en}"
+
+    class Meta:
+        db_table = 'city'        
+
 class Brand(models.Model):
     name_en = models.CharField(max_length=255)
     name_ar = models.CharField(max_length=255)
     description_en = models.TextField(blank=True, null=True)
     description_ar = models.TextField(blank=True, null=True)
     address = models.TextField()
-    city = models.CharField(max_length=255)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name="brands")
     image = models.ImageField(upload_to='brands/', null=True, blank=True)
 
     def __str__(self):
