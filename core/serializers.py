@@ -6,7 +6,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer,
 User = get_user_model()
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    email = serializers.EmailField()
+    phone = serializers.CharField(max_length=100)
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
@@ -14,21 +14,21 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # print(f"Attributes received: {attrs}")
 
         credentials = {
-            'email': attrs.get('email'),
+            'phone': attrs.get('phone'),
             'password': attrs.get('password')
         }
 
-        if not credentials['email']:
-            raise serializers.ValidationError('Email is required')
+        if not credentials['phone']:
+            raise serializers.ValidationError('phone is required')
         if not credentials['password']:
             raise serializers.ValidationError('Password is required')
 
-        user = User.objects.filter(email=credentials['email']).first()
+        user = User.objects.filter(phone=credentials['phone']).first()
         if user:
             if user.check_password(credentials['password']):
-                # Use the email as the username field for token generation
+                # Use the phone as the username field for token generation
                 data = super().validate({
-                    'email': user.email,  # Use 'username' key here
+                    'phone': user.phone,  # Use 'username' key here
                     'password': credentials['password']
                 })
                 return data
@@ -41,23 +41,23 @@ class UserCreateSerializer(BaseUserCreateSerializer):
     # first_name = serializers.CharField(required=True)
     class Meta(BaseUserCreateSerializer.Meta):
         #the id is auto_field so it doesn't shown in the view of creation
-        fields = ['id','name','email','phone_number','password']
+        fields = ['id','name','email','phone','password']
 
 class UserSerializer(BaseUserSerializer):
     # first_name = serializers.CharField(required=True)
     class Meta(BaseUserSerializer.Meta):
         #the id is auto_field so it doesn't shown in the view of creation
-        fields = ['id','name','email','phone_number']
+        fields = ['id','name','email','phone']
 
 
 
 class UserRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id','name','email','phone_number']
+        fields = ['id','name','email','phone']
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['name','phone_number']
+        fields = ['name','phone']
 

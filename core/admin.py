@@ -10,13 +10,13 @@ class CustomUserAdmin(UserAdmin):
     admin.site.index_title = "Welcome to Gifty's Admin Panel"
 
     # Fields to display in the list view
-    list_display = ('email', 'name', 'phone_number', 'is_active', 'is_staff', 'is_superuser')
+    list_display = ('email', 'name', 'phone', 'is_active', 'is_staff', 'is_superuser')
 
     # Fields to filter by in the right sidebar
     list_filter = ('is_active', 'is_staff', 'is_superuser')
 
     # Fields to search in the search bar
-    search_fields = ('email', 'name', 'phone_number')
+    search_fields = ('email', 'name', 'phone')
 
     # Fields to edit directly from the list view
     list_editable = ('is_active',)
@@ -24,7 +24,7 @@ class CustomUserAdmin(UserAdmin):
     # Fieldsets for organizing fields in the detail view
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal Info', {'fields': ('name', 'phone_number')}),
+        ('Personal Info', {'fields': ('name', 'phone')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
         ('Important Dates', {'fields': ('last_login',)}),
     )
@@ -33,7 +33,7 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'name', 'phone_number', 'password1', 'password2', 'is_active', 'is_staff', 'is_superuser'),
+            'fields': ('email', 'name', 'phone', 'password1', 'password2', 'is_active', 'is_staff', 'is_superuser'),
         }),
     )
 

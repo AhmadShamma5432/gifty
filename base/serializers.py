@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Category, Brand, Product, CategoryBrand, ProductCategory, ProductImage
 from rest_framework import serializers
+from django.db import transaction
 from .models import *
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -33,6 +34,11 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 'name_en', 'name_ar', 'description_en', 'description_ar',
             'rate', 'price', 'date_of_creation', 'brand', 'is_active', 'images'
         ]
+
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id','name_en','name_ar','price']
 
 class CategoryBrandSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()  
@@ -79,69 +85,69 @@ class FavoriteSerializer(serializers.ModelSerializer):
         return Favorite.objects.create(product_id=product_id,user_id=user_id)
 
     
-# class CartItemSerializer(serializers.ModelSerializer):
-#     product = SimpleProductSerializer()
-#     total_price = serializers.SerializerMethodField()
-#     class Meta:
-#         model = CartItem
-#         fields = ['id','product','quantity','total_price']
+class CartItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
+    total_price = serializers.SerializerMethodField()
+    class Meta:
+        model = CartItem
+        fields = ['id','product','quantity','total_price']
 
-#     def get_total_price(self,obj):
-#         return obj.product.Price * obj.quantity
+    def get_total_price(self,obj):
+        return obj.product.price * obj.quantity
 
-# class CreateCartItemSerializer(serializers.ModelSerializer):
-#     product_id = serializers.IntegerField()
-#     class Meta:
-#         model = CartItem
-#         fields = ['id','product_id','quantity']
+class CreateCartItemSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField()
+    class Meta:
+        model = CartItem
+        fields = ['id','product_id','quantity']
     
-#     def save(self, **kwargs):
-#         product_id = self.validated_data['product_id']
-#         quantity = self.validated_data['quantity']
-#         cart_id = self.context['cart_pk']
-#         with transaction.atomic():
+    def save(self, **kwargs):
+        product_id = self.validated_data['product_id']
+        quantity = self.validated_data['quantity']
+        cart_id = self.context['cart_pk']
+        with transaction.atomic():
 
-#             try:
-#                 product = Product.objects.get(pk=product_id)
-#             except Product.DoesNotExist:
-#                 raise serializers.ValidationError(f"The product you are looking for is not exist")
+            try:
+                product = Product.objects.get(pk=product_id)
+            except Product.DoesNotExist:
+                raise serializers.ValidationError(f"The product you are looking for is not exist")
             
-#             cart_item , created = CartItem.objects.get_or_create(cart_id=cart_id,
-#                                                                 product=product,
-#                                                                 defaults={'quantity':quantity})
-#             if not created :
-#                 cart_item.quantity += quantity
-#                 cart_item.save()
+            cart_item , created = CartItem.objects.get_or_create(cart_id=cart_id,
+                                                                product=product,
+                                                                defaults={'quantity':quantity})
+            if not created :
+                cart_item.quantity += quantity
+                cart_item.save()
 
-#             self.instance = cart_item
+            self.instance = cart_item
 
-#             return self.instance
+            return self.instance
 
-# class UpdateCartItemSerializer(serializers.ModelSerializer):
-#     product = SimpleProductSerializer(read_only=True)
-#     total_price = serializers.SerializerMethodField(read_only=True)
-#     class Meta:
-#         model = CartItem
-#         fields = ['id','product','quantity','total_price']
+class UpdateCartItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer(read_only=True)
+    total_price = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = CartItem
+        fields = ['id','product','quantity','total_price']
     
-#     def get_total_price(self,obj):
-#         return obj.product.Price * obj.quantity
+    def get_total_price(self,obj):
+        return obj.product.price * obj.quantity
 
-# class CreateCartSerailizer(serializers.ModelSerializer):
-#     id = serializers.UUIDField(read_only=True)
-#     class Meta:
-#         model = Cart
-#         fields = ['id','created_at']
+class CreateCartSerailizer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only=True)
+    class Meta:
+        model = Cart
+        fields = ['id','created_at']
 
-# class GetCartSerializer(serializers.ModelSerializer):
-#     items = CartItemSerializer(many=True)
-#     total_price = serializers.SerializerMethodField()
-#     class Meta:
-#         model = Cart
-#         fields = ['id','items','total_price']
+class GetCartSerializer(serializers.ModelSerializer):
+    items = CartItemSerializer(many=True)
+    total_price = serializers.SerializerMethodField()
+    class Meta:
+        model = Cart
+        fields = ['id','items','total_price']
 
-#     def get_total_price(self,obj):
-#         return sum([ value.product.Price * value.quantity for value in obj.items.all()])
+    def get_total_price(self,obj):
+        return sum([ value.product.price * value.quantity for value in obj.items.all()])
 
 # class OrderItemSerializer(serializers.ModelSerializer):
 #     product = SimpleProductSerializer()
@@ -190,7 +196,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 #                     order = order,
 #                     product = item.product,
 #                     quantity = item.quantity,
-#                     price = item.product.Price
+#                     price = item.product.price
 #                 )
 #                 for item in cart_items
 #             ]

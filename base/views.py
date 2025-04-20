@@ -80,32 +80,34 @@ class CityViewSet(viewsets.ModelViewSet):
     """
     queryset = City.objects.all()  # Order by English name
     serializer_class = CitySerializer
-# class CartView(CreateModelMixin,DestroyModelMixin,RetrieveModelMixin,GenericViewSet):
 
-#     def get_queryset(self):
-#         return Cart.objects.prefetch_related('items__product').all()
-#     def get_serializer_class(self):
-#         if self.request.method == 'POST':
-#             return CreateCartSerailizer
-#         elif self.request.method == 'GET':
-#             return GetCartSerializer
 
-# class CartItemView(ModelViewSet):
-#     serializer_class = CartItemSerializer
+class CartView(CreateModelMixin,DestroyModelMixin,RetrieveModelMixin,GenericViewSet):
 
-#     def get_queryset(self):
-#         return CartItem.objects.select_related('product').filter(cart_id = self.kwargs['cart_pk'])
+    def get_queryset(self):
+        return Cart.objects.prefetch_related('items__product').all()
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateCartSerailizer
+        elif self.request.method == 'GET':
+            return GetCartSerializer
 
-#     def get_serializer_class(self):
-#         if self.request.method == 'PATCH' or self.request.method == 'PUT':
-#             return UpdateCartItemSerializer
-#         elif self.request.method == 'POST':
-#             return CreateCartItemSerializer
-#         else:
-#             return CartItemSerializer
+class CartItemView(ModelViewSet):
+    serializer_class = CartItemSerializer
 
-#     def get_serializer_context(self):
-#         return {"cart_pk":self.kwargs['cart_pk']}
+    def get_queryset(self):
+        return CartItem.objects.select_related('product').filter(cart_id = self.kwargs['cart_pk'])
+
+    def get_serializer_class(self):
+        if self.request.method == 'PATCH' or self.request.method == 'PUT':
+            return UpdateCartItemSerializer
+        elif self.request.method == 'POST':
+            return CreateCartItemSerializer
+        else:
+            return CartItemSerializer
+
+    def get_serializer_context(self):
+        return {"cart_pk":self.kwargs['cart_pk']}
     
 
 # class OrderView(DestroyModelMixin,ListModelMixin,RetrieveModelMixin,CreateModelMixin,UpdateModelMixin,GenericViewSet):

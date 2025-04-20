@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from .models import Cart, CartItem
 from .models import (
     Category,
     Brand,
@@ -95,3 +96,62 @@ class CityAdmin(admin.ModelAdmin):
 
 admin.site.register(City, CityAdmin)
 
+
+from django.contrib import admin
+from django.utils.html import format_html
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+from .models import Cart, CartItem, Product
+
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 1
+    autocomplete_fields = ('product',)
+    min_num = 1
+    max_num = 10
+
+
+    def total_price_inline(self, obj):
+        return obj.quantity * obj.product.price
+    total_price_inline.short_description = 'Total Price'
+
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('id','cart', 'product','quantity', 'total_price')
+    search_fields = ('cart__id', 'product__name')
+    list_filter = ('cart', 'product')
+
+    def total_price(self, obj):
+        return obj.quantity * obj.product.price
+    total_price.short_description = 'Total Price'
+    total_price.admin_order_field = 'product__price'
+
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('id', 'created_at', 'total_items', 'total_price')
+    search_fields = ('id',)
+    list_filter = ('created_at',)
+    inlines = [CartItemInline]
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request).prefetch_related('items')
+        queryset = queryset.annotate(
+            total_price=Sum(
+                ExpressionWrapper(
+                    F('items__quantity') * F('items__product__price'),
+                    output_field=DecimalField()
+                )
+            )
+        )
+        return queryset
+
+    def total_items(self, obj):
+        return obj.items.count()
+    total_items.short_description = 'Total Items'
+
+    def total_price(self, obj):
+        return obj.total_price or 0
+    total_price.short_description = 'Total Price'
+    total_price.admin_order_field = 'total_price'
+
+
+# Register the models with the admin site
+admin.site.register(Cart, CartAdmin)
+admin.site.register(CartItem, CartItemAdmin)

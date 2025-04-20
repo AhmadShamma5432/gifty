@@ -1,6 +1,7 @@
 from django.db import models
+from uuid import uuid4
 from foodordering.settings import AUTH_USER_MODEL
-from .validations import validate_rate, validate_price
+from .validations import validate_rate, validate_price,validate_quantity
 
 
 class Category(models.Model):
@@ -97,17 +98,18 @@ class Favorite(models.Model):
     class Meta:
         unique_together = ('product','user')
         db_table = 'favorite'
-# class Cart(models.Model):
-#     id = models.UUIDField(primary_key=True,default=uuid4)
-#     created_at = models.DateField(auto_now_add=True)
 
-# class CartItem(models.Model):
-#     cart = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name='items')
-#     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_cartitem')
-#     quantity = models.PositiveIntegerField(validators=[validate_quantity])
+class Cart(models.Model):
+    id = models.UUIDField(primary_key=True,default=uuid4)
+    created_at = models.DateField(auto_now_add=True)
 
-#     class Meta:
-#         unique_together = [['cart','product']]
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name='items')
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_cartitem')
+    quantity = models.PositiveIntegerField(validators=[validate_quantity])
+
+    class Meta:
+        unique_together = [['cart','product']]
 
 
 # class Order(models.Model):

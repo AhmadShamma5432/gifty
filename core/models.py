@@ -3,25 +3,25 @@ from django.contrib.auth.models import AbstractUser,BaseUserManager
 # Create your models here.
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self,email,password=None,**extra_fields):
-        if not email:
-            raise ValueError("The email field must be set")
+    def create_user(self,phone,password=None,**extra_fields):
+        if not phone:
+            raise ValueError("The phone field must be set")
         else:
-            email = self.normalize_email(email)
-            user = self.model(email=email,**extra_fields)
+            user = self.model(phone=phone,**extra_fields)
             user.set_password(password)
             user.save(using=self._db)
             return user
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, phone, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
-        return self.create_user(email, password, **extra_fields)
+        return self.create_user(phone, password, **extra_fields)
+    
 class User(AbstractUser):
     username = models.CharField(max_length=255,unique=False,blank=True,null=True)
     name = models.TextField()
     email = models.EmailField(unique=True)
-    phone_number = models.TextField()
+    phone = models.CharField(unique=True,max_length=100)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -29,5 +29,5 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = []
