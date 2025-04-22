@@ -53,7 +53,7 @@ class ProductListFromCategorySerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     class Meta:
         model = ProductCategory
-        fields = ['product','image']  
+        fields = ['product','images']  
 
     def get_product(self, obj):
         brand = BrandSerializer(obj.product.brand)
