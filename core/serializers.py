@@ -6,7 +6,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer,
 User = get_user_model()
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    phone = serializers.CharField(max_length=100)
+    email = serializers.CharField(max_length=100)
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
@@ -14,21 +14,21 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # print(f"Attributes received: {attrs}")
 
         credentials = {
-            'phone': attrs.get('phone'),
+            'email': attrs.get('email'),
             'password': attrs.get('password')
         }
 
-        if not credentials['phone']:
-            raise serializers.ValidationError('phone is required')
+        if not credentials['email']:
+            raise serializers.ValidationError('email is required')
         if not credentials['password']:
             raise serializers.ValidationError('Password is required')
 
-        user = User.objects.filter(phone=credentials['phone']).first()
+        user = User.objects.filter(email=credentials['email']).first()
         if user:
             if user.check_password(credentials['password']):
-                # Use the phone as the username field for token generation
+                # Use the email as the username field for token generation
                 data = super().validate({
-                    'phone': user.phone,  # Use 'username' key here
+                    'email': user.email,  # Use 'username' key here
                     'password': credentials['password']
                 })
                 return data

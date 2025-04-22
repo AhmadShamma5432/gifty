@@ -3,19 +3,19 @@ from django.contrib.auth.models import AbstractUser,BaseUserManager
 # Create your models here.
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self,phone,password=None,**extra_fields):
-        if not phone:
+    def create_user(self,email,password=None,**extra_fields):
+        if not email:
             raise ValueError("The phone field must be set")
         else:
-            user = self.model(phone=phone,**extra_fields)
+            user = self.model(email=email,**extra_fields)
             user.set_password(password)
             user.save(using=self._db)
             return user
-    def create_superuser(self, phone, password=None, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
-        return self.create_user(phone, password, **extra_fields)
+        return self.create_user(email, password, **extra_fields)
     
 class User(AbstractUser):
     username = models.CharField(max_length=255,unique=False,blank=True,null=True)
@@ -29,5 +29,5 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'phone'
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
