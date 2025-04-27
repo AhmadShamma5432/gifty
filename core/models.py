@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import AbstractUser,BaseUserManager
 # Create your models here.
 
@@ -21,7 +22,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=255,unique=False,blank=True,null=True)
     name = models.TextField()
     email = models.EmailField(unique=True)
-    phone = models.CharField(unique=True,max_length=100)
+    phone = models.CharField(max_length=100)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -31,3 +32,14 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+class EmailVerificationCode(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=10)
+
+    def __str__(self):
+        return f"Code for {self.user.email}"

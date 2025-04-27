@@ -1,16 +1,14 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Cart, CartItem
-from .models import (
-    Category,
-    Brand,
-    Product,
-    CategoryBrand,
-    ProductCategory,
-    ProductImage,
-    Favorite,
-    City
-)
+from .models import * 
+
+class DeliveryTimeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'begin_time', 'end_time')  # Fields to display in the list view
+    search_fields = ('begin_time', 'end_time')       # Enable searching by time fields
+    list_filter = ('begin_time', 'end_time')         # Add filters for common fields
+
+# Register the DeliveryTime model with the custom admin class
+admin.site.register(delieveryTime, DeliveryTimeAdmin)
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name_en', 'name_ar', 'image_thumbnail')
@@ -65,19 +63,6 @@ class ProductAdmin(admin.ModelAdmin):
 
 admin.site.register(Product, ProductAdmin)
 
-class CategoryBrandAdmin(admin.ModelAdmin):
-    list_display = ('category', 'brand', 'created_at')
-    list_filter = ('category', 'brand')
-    search_fields = ('category__name_en', 'brand__name_en')
-
-admin.site.register(CategoryBrand, CategoryBrandAdmin)
-
-class ProductCategoryAdmin(admin.ModelAdmin):
-    list_display = ('product', 'category', 'created_at')
-    list_filter = ('product', 'category')
-    search_fields = ('product__name_en', 'category__name_en')
-
-admin.site.register(ProductCategory, ProductCategoryAdmin)
 
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('user', 'product')
@@ -97,61 +82,26 @@ class CityAdmin(admin.ModelAdmin):
 admin.site.register(City, CityAdmin)
 
 
-from django.contrib import admin
-from django.utils.html import format_html
-from django.db.models import Sum, F, ExpressionWrapper, DecimalField
-from .models import Cart, CartItem, Product
+class OrderItemInline(admin.TabularInline):  # or admin.StackedInline for a different layout
+    model = OrderItem
+    extra = 0  # Do not display extra empty forms by default
+    readonly_fields = ('total_product_price',)  # Make calculated fields read-only
 
-class CartItemInline(admin.TabularInline):
-    model = CartItem
-    extra = 1
-    autocomplete_fields = ('product',)
-    min_num = 1
-    max_num = 10
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',
+        'payment_status',
+        'placed_at',
+        'total_products_price',
+        'delivery_time',
+    )
+    list_filter = ('payment_status', 'placed_at')  # Add filters for common fields
+    search_fields = ('user__username', 'id')  # Enable searching by user or order ID
+    readonly_fields = ('placed_at', 'total_products_price')  # Protect calculated/automatic fields
+    inlines = [OrderItemInline]  # Include the inline for OrderItem
 
-
-    def total_price_inline(self, obj):
-        return obj.quantity * obj.product.price
-    total_price_inline.short_description = 'Total Price'
-
-class CartItemAdmin(admin.ModelAdmin):
-    list_display = ('id','cart', 'product','quantity', 'total_price')
-    search_fields = ('cart__id', 'product__name')
-    list_filter = ('cart', 'product')
-
-    def total_price(self, obj):
-        return obj.quantity * obj.product.price
-    total_price.short_description = 'Total Price'
-    total_price.admin_order_field = 'product__price'
-
-class CartAdmin(admin.ModelAdmin):
-    list_display = ('id', 'created_at', 'total_items', 'total_price')
-    search_fields = ('id',)
-    list_filter = ('created_at',)
-    inlines = [CartItemInline]
-
-    def get_queryset(self, request):
-        queryset = super().get_queryset(request).prefetch_related('items')
-        queryset = queryset.annotate(
-            total_price=Sum(
-                ExpressionWrapper(
-                    F('items__quantity') * F('items__product__price'),
-                    output_field=DecimalField()
-                )
-            )
-        )
-        return queryset
-
-    def total_items(self, obj):
-        return obj.items.count()
-    total_items.short_description = 'Total Items'
-
-    def total_price(self, obj):
-        return obj.total_price or 0
-    total_price.short_description = 'Total Price'
-    total_price.admin_order_field = 'total_price'
-
-
-# Register the models with the admin site
-admin.site.register(Cart, CartAdmin)
-admin.site.register(CartItem, CartItemAdmin)
+    def delivery_time(self, obj):
+        return obj.delievery_time  # Display the delivery time field
+    delivery_time.short_description = 'Delivery Time'

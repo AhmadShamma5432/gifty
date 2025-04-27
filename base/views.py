@@ -4,7 +4,7 @@ from rest_framework.mixins import ListModelMixin,RetrieveModelMixin
 from .models import Category,Brand,Product
 from .serializers import *
 from rest_framework import viewsets
-
+from django.db.models import Prefetch
 class GeneralMixin(GenericViewSet,ListModelMixin,RetrieveModelMixin):
     pass
 
@@ -12,15 +12,17 @@ class ProductViewSet(GeneralMixin):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.select_related('brand__city').prefetch_related('images').all()
+        user = self.request.user
+        queryset = Product.objects.select_related('brand__city').prefetch_related('images')\
+        .prefetch_related(
+            Prefetch('favorites_product', queryset=Favorite.objects.filter(user=user), to_attr='user_favorites')
+        ).all()
+        
         is_active = self.request.query_params.get('active', 'true').lower() == 'true'
         city = self.request.query_params.get('city') 
-        print(city)
-        print(queryset)
         if city: 
             queryset = queryset.filter(brand__city__name_en=city)
             
-        print(queryset) 
         queryset = queryset.filter(is_active=is_active)
 
         return queryset
@@ -49,7 +51,7 @@ class ProductCategoryViewSet(GeneralMixin):
         serializer = self.get_serializer(queryset, many=True)
 
         product_list = [item['product'] for item in serializer.data]
-
+        print(queryset)
         return Response(product_list)
     
     def retrieve(self, request, category_pk=None, pk=None):
@@ -82,64 +84,18 @@ class CityViewSet(viewsets.ModelViewSet):
     serializer_class = CitySerializer
 
 
-class CartView(CreateModelMixin,DestroyModelMixin,RetrieveModelMixin,GenericViewSet):
-
+class OrderViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows cities to be viewed or edited.
+    """
     def get_queryset(self):
-        return Cart.objects.prefetch_related('items__product').all()
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return CreateCartSerailizer
-        elif self.request.method == 'GET':
-            return GetCartSerializer
-
-class CartItemView(ModelViewSet):
-    serializer_class = CartItemSerializer
-
-    def get_queryset(self):
-        return CartItem.objects.select_related('product').filter(cart_id = self.kwargs['cart_pk'])
-
-    def get_serializer_class(self):
-        if self.request.method == 'PATCH' or self.request.method == 'PUT':
-            return UpdateCartItemSerializer
-        elif self.request.method == 'POST':
-            return CreateCartItemSerializer
-        else:
-            return CartItemSerializer
+        return Order.objects.prefetch_related('items__product__images')\
+                            .prefetch_related('items__product__brand__city')\
+                            .select_related('user')
+    serializer_class = OrderSerializer
 
     def get_serializer_context(self):
-        return {"cart_pk":self.kwargs['cart_pk']}
-    
-
-# class OrderView(DestroyModelMixin,ListModelMixin,RetrieveModelMixin,CreateModelMixin,UpdateModelMixin,GenericViewSet):
-    
-#     http_method_names = ['patch','delete','options','head','get','post']
-#     def get_permissions(self):
-
-#         if self.request.method in ['PATCH','DELETE','OPTIONS','HEAD']:
-#             return [IsAdminUser()]
-#         else:
-#             return [IsAuthenticated()]
+        return {"user_id": self.request.user.id}
 
 
-#     def get_serializer_class(self):
-#         if self.request.method == 'POST':
-#             return CreateOrderSerializers
-#         elif self.request.method == 'PATCH':
-#             return UpdateOrderSerializer
-#         else:
-#             return OrderSerializer
 
-#     def get_queryset(self):
-#         if self.request.user.is_staff:
-#             return Order.objects.prefetch_related('items__product').all()
-#         else:
-#             customer , created = Customer.objects.get_or_create(user_id=self.request.user.id)
-#             return Order.objects.prefetch_related('items__product').filter(customer=customer)
-    
-#     def create(self, request, *args, **kwargs):
-#         serializer = CreateOrderSerializers(data=request.data,context={"user_id":self.request.user.id})
-#         serializer.is_valid(raise_exception=True)
-#         order = serializer.save()
-
-#         return Response(OrderSerializer(order).data)
-    

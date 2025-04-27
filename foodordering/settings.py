@@ -88,7 +88,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {    
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),  # Set access token lifetime to 30 days
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=2),  # Set access token lifetime to 30 days
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
     'ROTATE_REFRESH_TOKENS': True,  # Rotate refresh tokens for added security
     'BLACKLIST_AFTER_ROTATION': True,  # Blacklist old refresh tokens after rotation
@@ -170,7 +170,13 @@ DJOSER = {
     'SERIALIZERS':{
         'user_create' : 'core.serializers.UserCreateSerializer',
         'current_user' : 'core.serializers.UserSerializer'
-    }
+    },
 }
 
-
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'abogasan55555354@gmail.com'  # Your Gmail address
+# EMAIL_HOST_PASSWORD = 'RUXP P AFI D QI Q XQZY'  # Your Gmail password or App Password
+# DEFAULT_FROM_EMAIL = 'abogasan55555354@gmail.com'

@@ -47,6 +47,7 @@ class Product(models.Model):
     name_ar = models.CharField(max_length=255)
     description_en = models.TextField(blank=True, null=True)
     description_ar = models.TextField(blank=True, null=True)
+    preparing_time = models.IntegerField()
     rate = models.DecimalField(max_digits=4, decimal_places=2, validators=[validate_rate], null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_price])
     date_of_creation = models.DateField(auto_now_add=True)
@@ -99,35 +100,37 @@ class Favorite(models.Model):
         unique_together = ('product','user')
         db_table = 'favorite'
 
-class Cart(models.Model):
-    id = models.UUIDField(primary_key=True,default=uuid4)
-    created_at = models.DateField(auto_now_add=True)
-
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name='items')
-    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_cartitem')
-    quantity = models.PositiveIntegerField(validators=[validate_quantity])
-
-    class Meta:
-        unique_together = [['cart','product']]
-
-
-# class Order(models.Model):
-#     pending = 'P'
-#     complete = 'C'
-#     failed = 'F'
-#     CHOICES_ARRAY = [
-#         (pending , 'pending'),
-#         (complete , 'complete'),
-#         (failed , 'failed')
-#     ]
-#     placed_at = models.DateField(auto_now_add = True)
-#     payment_status = models.CharField( max_length=1,choices = CHOICES_ARRAY , default=pending)
-#     customer = models.ForeignKey(Customer,on_delete=models.PROTECT)
+class Order(models.Model):
+    pending = 'P'
+    complete = 'C'
+    accepted = 'A'
+    failed = 'F'
+    CHOICES_ARRAY = [
+        (pending , 'pending'),
+        (complete , 'complete'),
+        (accepted , 'accepted'),
+        (failed , 'failed')
+    ]
+    payment_status = models.CharField( max_length=1,choices = CHOICES_ARRAY , default=pending)
+    placed_at = models.DateField(auto_now_add = True)
+    location1 = models.TextField()
+    location2 = models.TextField()
+    phone1 = models.CharField(max_length=255)
+    phone2 = models.CharField(max_length=255)
+    delievery_price = models.IntegerField()
+    delievery_time = models.DateTimeField()
+    total_products_price = models.DecimalField(max_digits=12,decimal_places=3)
+    user = models.ForeignKey(AUTH_USER_MODEL,on_delete=models.PROTECT)
 
 
-# class OrderItem(models.Model):
-#     order = models.ForeignKey(Order,on_delete=models.PROTECT,related_name='items')
-#     product = models.ForeignKey(Product,on_delete=models.PROTECT)
-#     quantity = models.IntegerField()
-#     price = models.DecimalField(max_digits=9,decimal_places=3)
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order,on_delete=models.PROTECT,related_name='items')
+    product = models.ForeignKey(Product,on_delete=models.PROTECT)
+    quantity = models.IntegerField()
+    total_product_price = models.DecimalField(max_digits=12,decimal_places=3)
+    notes = models.TextField(blank=True,null=True)
+
+class delieveryTime(models.Model):
+    begin_time = models.TimeField()
+    end_time = models.TimeField()
+    
