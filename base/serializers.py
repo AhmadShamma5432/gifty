@@ -34,7 +34,8 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'name_en', 'name_ar', 'description_en', 'description_ar','preparing_time',
+            'id', 'name_en', 'name_ar', 'description_en',
+            'description_ar','preparing_time',
             'rate', 'price', 'date_of_creation', 'brand', 'is_active', 'images','favorite_id'
         ]
 
@@ -48,10 +49,7 @@ class FavoriteProductSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
     class Meta:
         model = Product
-        fields = [
-            'id', 'name_en', 'name_ar', 'description_en', 'description_ar',
-            'rate', 'price', 'date_of_creation', 'brand', 'is_active', 'images'
-        ]
+        fields = '__all__'
 
 class CategoryBrandSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()  
@@ -76,6 +74,7 @@ class ProductListFromCategorySerializer(serializers.ModelSerializer):
             "name_ar": obj.product.name_ar,
             "description_en": obj.product.description_en,
             "description_ar": obj.product.description_ar,
+            "preparing_time": obj.product.preparing_time,
             "rate": str(obj.product.rate),  
             "price": str(obj.product.price),
             "date_of_creation": obj.product.date_of_creation,
@@ -110,7 +109,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'payment_status', 'placed_at', 'location1', 'location2', 'phone1', 'phone2', 'delievery_time', 'total_products_price', 'user', 'items']
+        fields = ['id', 'payment_status', 'placed_at', 'location1', 'location2', 'phone1', 'phone2', 'delievery_time','delievery_price', 'total_products_price', 'user', 'items']
 
     def create(self, validated_data):
         user_id = self.context['user_id']
