@@ -1,5 +1,6 @@
 from django.db import models
 from uuid import uuid4
+from django.utils import timezone
 from foodordering.settings import AUTH_USER_MODEL
 from .validations import validate_rate, validate_price,validate_quantity
 
@@ -121,6 +122,10 @@ class Order(models.Model):
     delievery_time = models.DateTimeField()
     total_products_price = models.DecimalField(max_digits=12,decimal_places=3)
     user = models.ForeignKey(AUTH_USER_MODEL,on_delete=models.PROTECT)
+    coupon = models.ForeignKey('base.Coupon',null=True,blank=True,on_delete=models.PROTECT
+        ,related_name='orders',
+        help_text="The coupon applied during checkout."
+    )
 
 
 class OrderItem(models.Model):
@@ -133,4 +138,46 @@ class OrderItem(models.Model):
 class delieveryTime(models.Model):
     begin_time = models.TimeField()
     end_time = models.TimeField()
+    
+class Coupon(models.Model):
+    
+    COUPON_TYPES = (
+        ('public', 'Public'),
+        ('private', 'Private'),
+    )
+
+    code = models.CharField(max_length=50, unique=True)
+    discount_percentage = models.IntegerField()  # e.g., 10.00 for 10%
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    user = models.ForeignKey(
+        AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='coupons',
+        help_text="If set, coupon is only applicable to this user."
+    )
+    is_active = models.BooleanField(default=True)
+    coupon_type = models.CharField(max_length=10, choices=COUPON_TYPES, default='public')
+
+    def __str__(self):
+        return f"{self.code} - {self.discount_percentage}%"
+
+    class Meta:
+        db_table = 'coupon'
+
+    def is_valid(self, user=None):
+        now = timezone.now()
+        if not self.is_active:
+            return False
+        if self.valid_from > now or self.valid_to < now:
+            return False
+        if self.user_id and user != self.user:
+            return False
+        return True
+
+class UsedCoupons(models.Model):
+    coupon = models.ForeignKey(Coupon,on_delete=models.CASCADE)
+    user = models.ForeignKey(AUTH_USER_MODEL,on_delete=models.CASCADE)
     

@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from rest_framework.exceptions import ValidationError
+from .serializers import OrderSerializer
 from .models import * 
 
 class DeliveryTimeAdmin(admin.ModelAdmin):
@@ -96,12 +98,49 @@ class OrderAdmin(admin.ModelAdmin):
         'placed_at',
         'total_products_price',
         'delivery_time',
+        'coupon'
     )
     list_filter = ('payment_status', 'placed_at')  # Add filters for common fields
     search_fields = ('user__username', 'id')  # Enable searching by user or order ID
     readonly_fields = ('placed_at', 'total_products_price')  # Protect calculated/automatic fields
     inlines = [OrderItemInline]  # Include the inline for OrderItem
 
+    def save_model(self, request, obj, form, change):
+        if change and 'payment_status' in form.changed_data:
+            old_order = Order.objects.get(pk=obj.pk)  # Get original state from DB
+            new_status = obj.payment_status
+            old_status = old_order.payment_status
+
+            if new_status == 'F' and old_status != 'F':
+                serializer = OrderSerializer(
+                    instance=old_order,  
+                    data={'payment_status': new_status},
+                    partial=True
+                )
+
+                if serializer.is_valid():
+                    updated_order = serializer.save()
+
+                    if updated_order.coupon:
+                        UsedCoupons.objects.filter(
+                            user=updated_order.user,
+                            coupon=updated_order.coupon
+                        ).delete()
+                else:
+                    raise ValidationError(serializer.errors)
+            else:
+                super().save_model(request, obj, form, change)
+        else:
+            super().save_model(request, obj, form, change)
+    
     def delivery_time(self, obj):
         return obj.delievery_time  # Display the delivery time field
     delivery_time.short_description = 'Delivery Time'
+
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ('id','code', 'discount_percentage', 'coupon_type', 'user', 'valid_from', 'valid_to', 'is_active')
+    list_filter = ('coupon_type', 'is_active', 'valid_from', 'valid_to')
+    search_fields = ('code', 'user__email')
+    
