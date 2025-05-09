@@ -136,7 +136,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
             coupon = None
 
-            coupon_id = validated_data['coupon_id']
+            try:
+                coupon_id = validated_data['coupon_id']
+            except:
+                coupon_id = None
             if coupon_id:
                 try:
                     coupon = Coupon.objects.get(pk=coupon_id)
