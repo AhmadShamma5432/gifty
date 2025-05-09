@@ -78,7 +78,5 @@ class CouponViewSet(viewsets.ModelViewSet):
     serializer_class = CouponSerializer
     def get_queryset(self):
         code = self.request.query_params.get('code', None)
-        print(code)
         queryset = Coupon.objects.get(code__exact=code)
-        print(queryset)
         return [queryset]

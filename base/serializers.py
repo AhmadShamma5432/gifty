@@ -121,7 +121,7 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
     user = UserSerializer(read_only=True)
     coupon = CouponSerializer(read_only=True)
-    coupon_id = serializers.IntegerField(write_only=True)
+    coupon_id = serializers.IntegerField(write_only=True,required=False)
 
     class Meta:
         model = Order
