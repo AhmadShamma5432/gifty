@@ -143,13 +143,13 @@ class OrderSerializer(serializers.ModelSerializer):
                 except Coupon.DoesNotExist:
                     raise serializers.ValidationError({"message": "Invalid coupon."})
 
-            if not coupon.is_valid(user=user):
-                raise serializers.ValidationError({"message": "This coupon is not valid for you."})
-            
-            if UsedCoupons.objects.filter(user=user,coupon=coupon):
-                raise serializers.ValidationError({"message": "you already have used this coupon"})
-            
-            UsedCoupons.objects.create(user=user,coupon=coupon)
+                if not coupon.is_valid(user=user):
+                    raise serializers.ValidationError({"message": "This coupon is not valid for you."})
+                
+                if UsedCoupons.objects.filter(user=user,coupon=coupon):
+                    raise serializers.ValidationError({"message": "you already have used this coupon"})
+                
+                UsedCoupons.objects.create(user=user,coupon=coupon)
             user_orders = Order.objects.filter(user_id=user_id,payment_status__in=['A'])
             # user_orders = Order.objects.filter(user_id=user_id,payment_status__in=['A','P'])
 
