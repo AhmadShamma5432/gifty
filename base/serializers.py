@@ -5,6 +5,9 @@ from rest_framework.exceptions import ValidationError
 from django.db import transaction
 from .models import *
 from core.serializers import UserSerializer
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,18 +35,27 @@ class ProductSerializer(serializers.ModelSerializer):
     # images = ProductImageSerializer(many=True, read_only=True)  # Nested serializer for product images
     brand = BrandSerializer(read_only=True)
     favorite_id = serializers.SerializerMethodField()
+    ordering_count = serializers.SerializerMethodField()
+    favorites_count = serializers.SerializerMethodField()
     class Meta:
         model = Product
         fields = [
             'id', 'name_en', 'name_ar', 'description_en',
-            'description_ar','preparing_time',
-            'rate', 'price', 'date_of_creation', 'brand', 'is_active', 'images','favorite_id'
+            'description_ar','preparing_time','rate', 'price','date_of_creation',
+            'brand', 'is_active', 'images','favorite_id','ordering_count','favorites_count',
         ]
 
     def get_images(self,obj):
         request = self.context.get('request')
         return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
-        
+    
+    def get_ordering_count(self,obj):
+        print(getattr(obj,'ordering_count',0))
+        return getattr(obj,'ordering_count',0)
+    
+    def get_favorites_count(self,obj):
+        print(getattr(obj,'favorites_count',0))
+        return getattr(obj,'favorites_count',0)
     
     def get_favorite_id(self,obj):
         if len(obj.user_favorites) == 0:
@@ -103,7 +115,7 @@ class OrderItemProductSerializer(serializers.ModelSerializer):
         return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
     
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = OrderItemProductSerializer(read_only=True)
+    product = ProductSerializer(read_only=True)
     product_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = OrderItem
@@ -159,9 +171,9 @@ class OrderSerializer(serializers.ModelSerializer):
             if user_orders.exists():
                 raise ValidationError("You already have a pending order. Please wait until it is completed before placing a new one.")
 
-            order = Order.objects.create(user_id=user_id, **validated_data)
-
-            # Bulk create order items
+            order = Order(user_id=user_id, **validated_data)
+            order.save() 
+            
             order_items = [
                 OrderItem(order=order, **item_data) for item_data in items_data
             ]
@@ -169,5 +181,15 @@ class OrderSerializer(serializers.ModelSerializer):
             order = Order.objects.prefetch_related('items__product__images')\
                                 .prefetch_related('items__product__brand__city')\
                                 .select_related('user').get(id=order.id)
+            
+            channel_layer = get_channel_layer()
+
+            async_to_sync(channel_layer.group_send)(
+                "admin_notifications",
+                {
+                    "type": "send_notification",
+                    "message": f"New order #{order.id} has been placed!"
+                }
+            )
             return order
         

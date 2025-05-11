@@ -1,16 +1,17 @@
-"""
-ASGI config for foodordering project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.0/howto/deployment/asgi/
-"""
+# foodordering/asgi.py
 
 import os
-
 from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
+from django.urls import re_path
+from notifications.routing import websocket_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'foodordering.settings')
 
-application = get_asgi_application()
+# Standard WSGI application for HTTP requests
+http_application = get_asgi_application()
+
+application = ProtocolTypeRouter({
+    "http": http_application,
+    "websocket": websocket_urlpatterns,
+})

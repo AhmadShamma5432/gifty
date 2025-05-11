@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 media
+notifications
 # Distribution / packaging
 migrations
 .Python
@@ -16,6 +17,7 @@ downloads/
 __pycache__/
 eggs/
 .eggs/
+bin/
 lib/
 include/
 Scripts/

@@ -34,6 +34,15 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 
 # Application definition
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
 INSTALLED_APPS = [
     'base',
     'core',
@@ -48,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'djoser',   
     'rest_framework_simplejwt.token_blacklist', 
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -96,6 +106,9 @@ SIMPLE_JWT = {
 }
 
 WSGI_APPLICATION = 'foodordering.wsgi.application'
+ASGI_APPLICATION = 'your_project.routing.application'
+
+
 
 
 # Database
