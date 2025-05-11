@@ -55,7 +55,8 @@ class FavoriteView(GeneralMixin,CreateModelMixin,DestroyModelMixin):
     serializer_class = FavoriteSerializer
 
     def get_serializer_context(self):
-        return {"user_id": self.request.user.id}
+        return {"user_id": self.request.user.id,
+                "request": self.request}
     
 class CityViewSet(viewsets.ModelViewSet):
     """
@@ -82,7 +83,8 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_serializer_context(self):
         return {"user_id": self.request.user.id,
-                "user": self.request.user}
+                "user": self.request.user,
+                "request":self.request}
     
     def get_serializer_class(self):
         return OrderSerializer

@@ -35,27 +35,17 @@ class ProductSerializer(serializers.ModelSerializer):
     # images = ProductImageSerializer(many=True, read_only=True)  # Nested serializer for product images
     brand = BrandSerializer(read_only=True)
     favorite_id = serializers.SerializerMethodField()
-    ordering_count = serializers.SerializerMethodField()
-    favorites_count = serializers.SerializerMethodField()
     class Meta:
         model = Product
         fields = [
             'id', 'name_en', 'name_ar', 'description_en',
             'description_ar','preparing_time','rate', 'price','date_of_creation',
-            'brand', 'is_active', 'images','favorite_id','ordering_count','favorites_count',
+            'brand', 'is_active', 'images','favorite_id'
         ]
 
     def get_images(self,obj):
         request = self.context.get('request')
         return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
-    
-    def get_ordering_count(self,obj):
-        print(getattr(obj,'ordering_count',0))
-        return getattr(obj,'ordering_count',0)
-    
-    def get_favorites_count(self,obj):
-        print(getattr(obj,'favorites_count',0))
-        return getattr(obj,'favorites_count',0)
     
     def get_favorite_id(self,obj):
         if len(obj.user_favorites) == 0:
@@ -63,12 +53,20 @@ class ProductSerializer(serializers.ModelSerializer):
         return obj.user_favorites[0].id
     
 class FavoriteProductSerializer(serializers.ModelSerializer):
-    images = ProductImageSerializer(many=True, read_only=True)  # Nested serializer for product images
+    images = serializers.SerializerMethodField()  # Nested serializer for product images
     brand = BrandSerializer(read_only=True)
+    favorite_id = serializers.SerializerMethodField()
     class Meta:
         model = Product
         fields = '__all__'
 
+    def get_images(self,obj):
+        request = self.context.get('request')
+        return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
+    
+    def get_favorite_id(self,obj):
+        return self.context.get("favorite_id")
+    
 class CategoryBrandSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()  
     brand = serializers.StringRelatedField()     
@@ -84,12 +82,19 @@ class ProductListFromCategorySerializer(serializers.ModelSerializer):
         fields = ['product']  
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    product = FavoriteProductSerializer(read_only=True)
+    product = serializers.SerializerMethodField()
     product_id = serializers.IntegerField(write_only=True)
+    # favorite_id = serializers.SerializerMethodField()
     class Meta:
         model = Favorite
         fields = ['id','product','product_id']
 
+    def get_product(self, obj):
+        request = self.context.get('request')
+        print(obj.id)
+        serializer = FavoriteProductSerializer(obj.product, context={'request': request,'favorite_id':obj.id})
+        return serializer.data
+    
     def create(self, validated_data):
         product_id = validated_data['product_id']
         user_id = self.context['user_id']
@@ -115,12 +120,17 @@ class OrderItemProductSerializer(serializers.ModelSerializer):
         return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
     
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
+    product = serializers.SerializerMethodField()
     product_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = OrderItem
         fields = ['id', 'product','product_id', 'quantity', 'notes', 'total_product_price']
 
+    def get_product(self, obj):
+        request = self.context.get('request')
+        print(obj.__dir__())
+        serializer = ProductSerializer(obj.product, context={'request': request})
+        return serializer.data
 
 class CouponSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
